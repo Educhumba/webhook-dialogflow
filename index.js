@@ -58,21 +58,19 @@ if (!policies || policies.length === 0) {
 } else if (policies.includes("all")) {
   for (const key in policyDescriptions) {
     const { text, link } = policyDescriptions[key];
-    reply += `🔹 *${key.toUpperCase()}*\n${text}\n[See more here](${link})\n\n`;
+    reply += `🔹 <b>${key.toUpperCase()}</b><br>${text}<br><a href="${link}" target="_blank">Read more about ${policy}</a><br><br>`;
   }
 } else {
   policies.forEach((policy) => {
     const lower = policy.toLowerCase();
     if (policyDescriptions[lower]) {
       const { text, link } = policyDescriptions[lower];
-      reply += `🔹 *${policy.toUpperCase()}*\n${text}\n[See more here](${link})\n\n`;
+      reply += `🔹 <b>${policy.toUpperCase()}</b><br>${text}<br><a href="${link}" target="_blank">Read more about ${policy}</a><br><br>`;
     } else {
       reply += `⚠️ I don't have info on "${policy}".\n\n`;
     }
   });
 }
-
-
   res.json({ fulfillmentText: reply.trim() });
 });
 
