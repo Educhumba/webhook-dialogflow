@@ -6,13 +6,20 @@ app.use(bodyParser.json());
 
 app.post("/webhook", (req, res) => {
   const intent = req.body.queryResult.intent.displayName;
-  const policies = req.body.queryResult.parameters.policy_types;
+  const policies = req.body.queryResult.parameters.policy_type;
 
   const policyDescriptions = {
     motor: "Motor insurance covers your vehicle against damage, theft, and third-party liability.",
     health: "Health insurance helps you pay for medical expenses including hospitalization.",
     fire: "Fire insurance protects your property against fire-related damage.",
     life: "Life insurance ensures your loved ones are financially protected after your death.",
+    home: "Home insurance protects your house and belongings against risks like fire, theft, or natural disasters.",
+    accident: "Accident insurance provides coverage in case of accidental injuries or death.",
+    travel: "Travel insurance covers medical and trip-related losses during your travels.",
+    marine: "Marine insurance covers loss or damage of ships, cargo, and transport.",
+    aviation: "Aviation insurance provides coverage for aircraft-related risks.",
+    industrial: "Industrial insurance covers factories, equipment, and liability for industrial operations.",
+    index: "Index insurance is based on a weather or production index rather than actual loss."
   };
 
   let reply = "";
