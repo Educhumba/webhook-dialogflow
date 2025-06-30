@@ -28,9 +28,9 @@ async function appendToSheet(userText, botReply, intentName) {
       resource: { values: row },
     });
 
-    console.log("✅ Logged to Google Sheets:", row);
+    console.log("Logged to Google Sheets:", row);
   } catch (err) {
-    console.error("❌ Failed to log to Google Sheets:", err.message);
+    console.error("Failed to log to Google Sheets:", err.message);
   }
 }
 // checking the requested policy type and return its details
@@ -80,6 +80,17 @@ app.post("/webhook", async (req, res) => {
       link: "https://www.ummainsurance.com/index-based-insurance"
     }
   };
+  if (intent === "Default Fallback Intent"){
+    const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase";
+    await appendToSheet(userText, botReply, intent);
+    return res.json({
+      fulfillmentMessages:[
+        {
+          text:{text:[botReply]}
+        }
+      ]
+    });
+  }
   if (!policies || policies.length === 0) {
     const botReply = "Please tell me which policy you want details about.";
     await appendToSheet(userText, botReply, intent);
