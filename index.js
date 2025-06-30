@@ -4,7 +4,7 @@ const app = express();
 app.use(bodyParser.json());
 //connecting to googlesheet for chats logging
 const { google } = require('googleapis');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const fs = require('fs');
 // logging to google sheets
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
@@ -18,7 +18,7 @@ async function appendToSheet(userText, botReply, intentName) {
     const client = await auth.getClient();
     const sheets = google.sheets({ version: 'v4', auth: client });
 
-    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    const time = moment().tz('Africa/Nairobi').format('YYYY-MM-DD HH:mm:ss');
     const row = [[time, userText, botReply, intentName]];
 
     await sheets.spreadsheets.values.append({
@@ -119,11 +119,12 @@ app.post("/webhook", async (req, res) => {
         richCards.push({
           type: "info",
           title: policy.toUpperCase(),
-          subtitle: `⚠️ I don't have info on "${policy}".`
+          subtitle: `I don't have info on "${policy}".`
         });
       }
     });
-    const botReply = `Sent ${keysToShow.length} policy description(s)`;
+    const matchedPolicies = keysToShow.filter(p=>policyDescriptions[p]);
+    const botReply = `Sent ${matchedPolicies.length} policy description(s): [${matchedPolicies.join(', ')}]`;
     await appendToSheet(userText, botReply, intent);
     res.json({
       fulfillmentMessages: [
