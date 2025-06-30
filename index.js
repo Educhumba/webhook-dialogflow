@@ -10,7 +10,7 @@ const fs = require('fs');
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = '1Psmc91dm3_iLFIltVnoadcAWSUu74lFtFwqXG_aNvTw';
 const auth = new google.auth.GoogleAuth({
-  keyFile: './umman-wksy-0bfba025a22b.json',
+  credentials: JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON),
   scopes: SCOPES,
 });
 async function appendToSheet(userText, botReply, intentName) {
