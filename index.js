@@ -14,18 +14,24 @@ const auth = new google.auth.GoogleAuth({
   scopes: SCOPES,
 });
 async function appendToSheet(userText, botReply, intentName) {
-  const client = await auth.getClient();
-  const sheets = google.sheets({ version: 'v4', auth: client });
-  const time = moment().format('YYYY-MM-DD HH:mm:ss');
-  const row = [[time, userText, botReply, intentName]];
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: 'Sheet1!A:D',
-    valueInputOption: 'RAW',
-    resource: {
-      values: row,
-    },
-  });
+  try {
+    const client = await auth.getClient();
+    const sheets = google.sheets({ version: 'v4', auth: client });
+
+    const time = moment().format('YYYY-MM-DD HH:mm:ss');
+    const row = [[time, userText, botReply, intentName]];
+
+    await sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: 'Sheet1!A:D',
+      valueInputOption: 'RAW',
+      resource: { values: row },
+    });
+
+    console.log("✅ Logged to Google Sheets:", row);
+  } catch (err) {
+    console.error("❌ Failed to log to Google Sheets:", err.message);
+  }
 }
 // checking the requested policy type and return its details
 app.post("/webhook", async (req, res) => {
