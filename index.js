@@ -40,6 +40,33 @@ app.post("/webhook", async (req, res) => {
   const intent = req.body.queryResult.intent.displayName;
   const policies = req.body.queryResult.parameters.policy_type;
   const userText = req.body.queryResult.queryText;
+  //logging intents not understood by the bot to google sheets
+  if (intent === "Default Fallback Intent"){
+    const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase";
+    await appendToSheet(userText, botReply, intent);
+    return res.json({
+      fulfillmentMessages:[
+        {
+          text:{text:[botReply]}
+        }
+      ]
+    });
+  }
+  // human agent request
+  if (intent == "Talk to Human"){
+    const botReply=`Reach human though: \n\n <a href="https://wa.me/254110146704" target="_blank">Chat on WhatsApp</a>\nOr call us on:+254775444777`;
+    await appendToSheet(req.body.queryResult.queryText, "Requested Human Agent", intent)
+    return res.json({fulfillmentMessages:[{
+      payload:{richContent:[[{
+        type: "info",
+        title:"Human Assistance",
+        subtitle:"Click below to chat or call us",
+        actionLink: "https://wa.me/254110146704"
+      }]]}
+    },{
+      text:{text:[botReply]}
+    }]});
+  }
   const policyDescriptions = {
     motor: {
       text: "Motor insurance covers your vehicle against damage, theft, and third-party liability.(Click to view more)",
@@ -82,17 +109,6 @@ app.post("/webhook", async (req, res) => {
       link: "https://www.ummainsurance.com/index-based-insurance"
     }
   };
-  if (intent === "Default Fallback Intent"){
-    const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase";
-    await appendToSheet(userText, botReply, intent);
-    return res.json({
-      fulfillmentMessages:[
-        {
-          text:{text:[botReply]}
-        }
-      ]
-    });
-  }
   if (!policies || policies.length === 0) {
     const botReply = "Please tell me which policy you want details about.";
     await appendToSheet(userText, botReply, intent);
@@ -138,21 +154,6 @@ app.post("/webhook", async (req, res) => {
       ]
     });
   }
-  // human agent request
-if (intent == "Talk to Human"){
-  const botReply=`Reach human though: \n\n <a href="https://wa.me/254110146704" target="_blank">Chat on WhatsApp</a>\nOr call us on:+254775444777`;
-  await appendToSheet(req.body.queryResult.queryText, "Requested Human Agent", intent)
-  return res.json({fulfillmentMessages:[{
-    payload:{richContent:[[{
-      type: "info",
-      title:"Human Assistance",
-      subtitle:"Click below to chat or call us",
-      actionLink: "https://wa.me/254110146704"
-    }]]}
-  },{
-    text:{text:[botReply]}
-  }]});
-}
 });
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
