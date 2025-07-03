@@ -6,6 +6,8 @@ app.use(bodyParser.json());
 const { google } = require('googleapis');
 const moment = require('moment-timezone');
 const fs = require('fs');
+const { type } = require("os");
+const { title } = require("process");
 // logging to google sheets
 const SCOPES = ['https://www.googleapis.com/auth/spreadsheets'];
 const SHEET_ID = '1Psmc91dm3_iLFIltVnoadcAWSUu74lFtFwqXG_aNvTw';
@@ -137,5 +139,20 @@ app.post("/webhook", async (req, res) => {
     });
   }
 });
+// human agent request
+if (intent == "Talk to Human"){
+  const botReply=`Reach human though: \n\n <a href="https://wa.me/254110146704" target="_blank">Chat on WhatsApp</a>\nOr call us on:+254775444777`;
+  await appendToSheet(req.body.queryResult.queryText, "Requested Human Agent", intent)
+  return res.json({fulfillmentMessages:[{
+    payload:{richContent:[[{
+      type: "info",
+      title:"Human Assistance",
+      subtitle:"Click below to chat or call us",
+      actionLink: "https://wa.me/254110146704"
+    }]]}
+  },{
+    text:{text:[botReply]}
+  }]});
+}
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
