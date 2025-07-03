@@ -35,11 +35,11 @@ async function appendToSheet(userText, botReply, intentName) {
     console.error("Failed to log to Google Sheets:", err.message);
   }
 }
-// checking the requested policy type and return its details
 app.post("/webhook", async (req, res) => {
   const intent = req.body.queryResult.intent.displayName;
   const policies = req.body.queryResult.parameters.policy_type;
   const userText = req.body.queryResult.queryText;
+  const Human_Agent_context= "waiting_human_agent_decision";
   //logging intents not understood by the bot to google sheets
   if (intent === "Default Fallback Intent"){
     const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase";
@@ -48,13 +48,23 @@ app.post("/webhook", async (req, res) => {
       fulfillmentMessages:[
         {
           text:{text:[botReply]}
-        }
-      ]
+        },{payload:{richContent:[[{
+          type:"chips",
+          options:[
+            {text:"Yes"},
+            {text:"No"}
+          ]
+        }]]}}
+      ],
+      outputContexts:[{
+        name:`${req.body.session}/context/${Human_Agent_context}`,
+        lifespanCount : 2
+      }]
     });
   }
   // human agent request
   if (intent == "Talk to human"){
-    const botReply=`Or Call us on:+254775444777.\n Your can also request a call on our website`;
+    const botReply=`Or Call us on:+254775444777.\n You can also request a call on our website`;
     await appendToSheet(req.body.queryResult.queryText, "Requested Human Agent", intent)
     return res.json({fulfillmentMessages:[{
       payload:{richContent:[[{
@@ -109,6 +119,7 @@ app.post("/webhook", async (req, res) => {
       link: "https://www.ummainsurance.com/index-based-insurance"
     }
   };
+  // checking the requested policy type and return its details
   if (!policies || policies.length === 0) {
     const botReply = "Please tell me which policy you want details about.";
     await appendToSheet(userText, botReply, intent);
