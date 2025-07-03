@@ -56,10 +56,6 @@ app.post("/webhook", async (req, res) => {
           ]
         }]]}}
       ],
-      outputContexts:[{
-        name:`${req.body.session}/context/${Human_Agent_context}`,
-        lifespanCount : 2
-      }]
     });
   }
   // Handle YES after fallback
