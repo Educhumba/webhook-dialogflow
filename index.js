@@ -42,7 +42,7 @@ app.post("/webhook", async (req, res) => {
   const Human_Agent_context= "waiting_human_agent_decision";
   //logging intents not understood by the bot to google sheets
   if (intent === "Default Fallback Intent"){
-    const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase";
+    const botReply = "I am sorry, I didn't quite understand what you said. Please rephrase or Do you want to speak to a human agent?";
     await appendToSheet(userText, botReply, intent);
     return res.json({
       fulfillmentMessages:[
@@ -60,6 +60,42 @@ app.post("/webhook", async (req, res) => {
         name:`${req.body.session}/context/${Human_Agent_context}`,
         lifespanCount : 2
       }]
+    });
+  }
+  // Handle YES after fallback
+  if (intent === "Default Fallback Intent - yes") {
+    const botReply = `Or Call us on: +254775444777.\nYou can also request a call on our website.`;
+    await appendToSheet(userText, "User agreed to speak to a human agent", intent);
+    return res.json({
+      fulfillmentMessages: [
+        {
+          payload: {
+            richContent: [[
+              {
+                type: "info",
+                title: "Chat on WhatsApp",
+                subtitle: "Click to chat on WhatsApp",
+                actionLink: "https://wa.me/254110146704"
+              }
+            ]]
+          }
+        },
+        {
+          text: { text: [botReply] }
+        }
+      ]
+    });
+  }
+  // Handle NO after fallback
+  if (intent === "Default Fallback Intent - no") {
+    const botReply = "Thank you. Is there anything else I can help you with?";
+    await appendToSheet(userText, "User declined human assistance", intent);
+    return res.json({
+      fulfillmentMessages: [
+        {
+          text: { text: [botReply] }
+        }
+      ],
     });
   }
   // human agent request
