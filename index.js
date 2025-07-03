@@ -53,7 +53,7 @@ app.post("/webhook", async (req, res) => {
     });
   }
   // human agent request
-  if (intent == "Talk to Human"){
+  if (intent == "Talk to human"){
     const botReply=`Reach human though: \n\n <a href="https://wa.me/254110146704" target="_blank">Chat on WhatsApp</a>\nOr call us on:+254775444777`;
     await appendToSheet(req.body.queryResult.queryText, "Requested Human Agent", intent)
     return res.json({fulfillmentMessages:[{
